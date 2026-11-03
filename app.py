@@ -9,6 +9,12 @@ page create..
 
 import streamlit as st
 #page configurationUSB_Analiz
+import subprocess
+import os
+import random
+import json
+
+from collections import Counter
 
 st.set_page_config(page_title= "USB_Analyz", page_icon = "💾", layout = "wide")
 
@@ -51,7 +57,7 @@ subprocess
 
 """
 
-import subprocess
+
 
 result = subprocess.run(
     ["lsblk", "-J"],
@@ -67,7 +73,6 @@ print("STDOUT:", repr(result.stdout))
 print("STDERR:", repr(result.stderr))
 print("RETURN CODE:", result.returncode)
 
-import json
 
 data = json.loads(result.stdout)
 devices = data["blockdevices"]
@@ -99,31 +104,37 @@ st.metric("Connected USB", usb_count)
 st.metric("Total Storage", f"{total_storage:.2f} GB")
 
 
+total_files = 0
+file_extensions = Counter()
+
 
 if mount_path:
-    st.write(mount_path)
+    for root, dirs, files in os.walk(mount_path):
+        
+        for file in files:
+            total_files += 1
+        
+        extension = os.path.splitext(file)[1].lower()
+        file_extensions[extension] += 1
+
+        st.write(mount_path)
+
+        st.metric("Total Files", total_files)
+        
+        st.subheader("File Format Analysis")
+        st.write(file_extensions)
+
 else:
-    st.info("No USB device connected.")
+
+    st.write("No USB device connected !")
+
+    st.metric("Total files", 0)
+
+    st.subheader("File Format Analysis")
+    st.info("No File to Analyze !")
+    
 
 
-    """
-    make engin scaning module for usb device
-
-    """
-
-
-import os
-
-#if mount_path:
-#    files = os.listdir(mount_path)
-#    st.write(files)
-
-
-
-
-for root, dirs, files in os.walk(mount_path):
-    for file in files:
-        st.write(file)
 
 
 
