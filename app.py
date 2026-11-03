@@ -1,3 +1,12 @@
+"""
+p - > raheb
+
+page create..
+
+"""
+
+
+
 import streamlit as st
 #page configurationUSB_Analiz
 
@@ -36,6 +45,12 @@ if st.button("scan USB Devices"):
     st.info("USB scanning module is coming soon!")
 
 
+"""
+
+subprocess
+
+"""
+
 import subprocess
 
 result = subprocess.run(
@@ -59,9 +74,13 @@ devices = data["blockdevices"]
 usb_count = 0
 total_storage = 0
 
+mount_path = None
+
 for device in devices:
     if device["rm"]:
         usb_count+=1
+        if device["mountpoints"]:
+            mount_path = device["mountpoints"][0]
         usb_info = {
             "name": device["name"],
             "size": device["size"],
@@ -73,8 +92,50 @@ for device in devices:
 
         st.json(usb_info)
 
+
+
 st.metric("Connected USB", usb_count)
 #st.write(size_number)
-
 st.metric("Total Storage", f"{total_storage:.2f} GB")
 
+
+
+if mount_path:
+    st.write(mount_path)
+else:
+    st.info("No USB device connected.")
+
+
+    """
+    make engin scaning module for usb device
+
+    """
+
+
+import os
+
+#if mount_path:
+#    files = os.listdir(mount_path)
+#    st.write(files)
+
+
+
+
+for root, dirs, files in os.walk(mount_path):
+    for file in files:
+        st.write(file)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+st.write("creator app by 'raheb' :) ")
